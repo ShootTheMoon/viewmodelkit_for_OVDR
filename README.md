@@ -2,6 +2,8 @@
 
 OVERDARE 용 1인칭 뷰모델 킷. **ONLY ONE TAP** 에서 쓰던 팔 모델 + 뷰모델 Lua + 블렌더→오버데어 클립 추출 도구를 한 곳에 모았다.
 
+**처음이면 [사용법.md](사용법.md) 부터 읽을 것.**
+
 > OVERDARE 는 Roblox 가 아니다. 비슷해 보이는 API 도 동작이 다를 수 있으니 문서를 보거나 직접 재볼 것.
 
 ## 구성
@@ -15,7 +17,7 @@ lua/
   ViewmodelConfig.lua       위치·배율·캐릭터별 설정 (ModuleScript)
   ViewmodelAnimData.lua     기본 클립 모음 (ModuleScript)
   FirstPersonLock.lua       1인칭 카메라 고정 (LocalScript)
-  clips/ViewmodelAnim*.lua  캐릭터별 애니메이션 클립 (ModuleScript, 33개)
+  clips/ViewmodelAnim*.lua  캐릭터별 애니메이션 클립 (ModuleScript, 50개 = 설정이 부르는 것 전부)
 tools/
   build_vmkit.py            armbones FBX -> VMKit_Arms 만드는 스크립트
   make_maxico_*.py          블렌더 액션 -> 클립 Lua 추출 예시
