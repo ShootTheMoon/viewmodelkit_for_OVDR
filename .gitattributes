@@ -1,0 +1,5 @@
+*.blend binary
+*.fbx binary
+*.lua text eol=lf
+*.py text eol=lf
+*.md text eol=lf
