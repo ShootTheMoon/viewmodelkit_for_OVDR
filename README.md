@@ -12,6 +12,10 @@ OVERDARE 용 1인칭 뷰모델 킷. **ONLY ONE TAP** 에서 쓰던 팔 모델 + 
 blender/
   VMKit_Arms.blend    팔만 남긴 뷰모델 팔 (뼈대 없음, 6조각 강체)
   VMKit_Arms.fbx      위 파일 FBX 내보내기 (오버데어 임포트용)
+  source/
+    Mixamo_For_OVDR.fbx               원본 전신 템플릿 (메시 6개, 뼈 22개)
+    Mixamo_For_OVDR_Arms.fbx          팔 2개 + 뼈 22개 전부 (바디파츠 업로드용)
+    Mixamo_For_OVDR_Arms_armbones.fbx 팔 2개 + 뼈 12개 (build_vmkit.py 입력)
 lua/
   ViewmodelController.lua   뷰모델 본체 (LocalScript)
   ViewmodelConfig.lua       위치·배율·캐릭터별 설정 (ModuleScript)
@@ -19,16 +23,37 @@ lua/
   FirstPersonLock.lua       1인칭 카메라 고정 (LocalScript)
   clips/ViewmodelAnim*.lua  캐릭터별 애니메이션 클립 (ModuleScript, 50개 = 설정이 부르는 것 전부)
 tools/
+  arms_split.py             원본 전신 FBX -> 팔만 남긴 FBX (Arms / Arms_armbones)
+  arms_verify.py            위 결과를 원본과 뼈·포즈·메시 단위로 대조
   build_vmkit.py            armbones FBX -> VMKit_Arms 만드는 스크립트
+  capture/                  분리 결과 확인 캡처 (원본 겹치기, 12뼈 버전)
   make_maxico_*.py          블렌더 액션 -> 클립 Lua 추출 예시
   export_maxico_arms.py     팔 + 무기를 오버데어 임포트용 FBX 로 내보내는 예시
   srcedit.py                .ovdrjm 안 스크립트 Source 를 안전하게 꺼내고 넣는 도우미
   maxico_arms_v1_meta.json  make_maxico_*.py 가 쓰는 파츠 기준 좌표
 ```
 
+## 원본에서 팔 뽑기 (arms_split)
+
+`blender/source/Mixamo_For_OVDR.fbx` 는 OVERDARE 아바타 템플릿 전신이다. 메시는 Head / Torso / LeftArm / RightArm / LeftLeg / RightLeg 6개로 이미 나뉘어 있고, 뼈는 22개(R15 식 UpperArm·LowerArm·Hand), 단위 cm, 애니메이션 없음.
+
+`tools/arms_split.py` 는 팔 메시 2개만 남기고 나머지를 지운다. 트랜스폼·포즈·웨이트는 손대지 않는다.
+
+```
+blender -b --python tools/arms_split.py -- blender/source/Mixamo_For_OVDR.fbx OUT_DIR                   # Arms.fbx (뼈 22)
+blender -b --python tools/arms_split.py -- blender/source/Mixamo_For_OVDR.fbx OUT_DIR --arm-bones-only  # Arms_armbones.fbx (뼈 12)
+blender -b --python tools/arms_verify.py -- blender/source/Mixamo_For_OVDR.fbx OUT_DIR/Mixamo_For_OVDR_Arms.fbx
+```
+
+- 두 결과 모두 원본과 라운드트립 대조 완료 : 뼈 위치 오차 0.001 cm 이하, 포즈 본 22개 일치, 팔 메시 verts 127/114·웨이트 그룹 3+3 유지, Armature scale 0.01·cm 단위 유지.
+- 파일은 rest 가 A포즈이고 그 위에 T포즈가 얹힌 구조다. 둘 다 보존된다.
+- `--arm-bones-only` 는 머리 2개·다리 8개 뼈를 지우고 팔 체인 8개 + 팔이 매달리는 Root → LowerTorso → UpperTorso01 → UpperTorso02 4개를 남긴다. 몸통 연결선까지 지우면 팔 뼈가 부모 없이 떠서 리그에 붙일 때 기준이 어긋난다.
+- 바디파츠로 업로드할 땐 Arms_armbones 를 먼저 넣어 보고, Studio 가 거부하면 뼈 22개짜리 Arms 로.
+- Blender 는 기본 FBX export 옵션으로 스케일이 그대로 왕복된다. `--scale-mode ALL` 은 그게 깨졌을 때만.
+
 ## 팔 모델 (VMKit_Arms)
 
-원본 : `Mixamo_For_OVDR_Arms_armbones.fbx` (Mixamo 기반 OVDR 팔, 뼈 12개).
+원본 : `blender/source/Mixamo_For_OVDR_Arms_armbones.fbx` (위 단계의 결과, 뼈 12개).
 
 - 몸통 뼈(Root / LowerTorso / UpperTorso01·02)와 길이 0 인 `*Hand001` 을 버리고 **팔만** 남겼다.
 - 스키닝 메시를 뼈마다 잘라 **강체 6조각** 으로 만들었다. 뷰모델 코드는 뼈가 아니라 파츠 CFrame 을 움직인다.
