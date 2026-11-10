@@ -25,6 +25,7 @@ lua/
 tools/
   arms_split.py             원본 전신 FBX -> 팔만 남긴 FBX (Arms / Arms_armbones)
   arms_verify.py            위 결과를 원본과 뼈·포즈·메시 단위로 대조
+  arms_render.py            원본(회색)과 결과(빨강)를 겹쳐 정면·측면 직교 렌더 (눈으로 보는 확인)
   build_vmkit.py            armbones FBX -> VMKit_Arms 만드는 스크립트
   capture/                  분리 결과 확인 캡처 (원본 겹치기, 12뼈 버전)
   make_maxico_*.py          블렌더 액션 -> 클립 Lua 추출 예시
